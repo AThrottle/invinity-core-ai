@@ -1,0 +1,181 @@
+// ============================================
+// INFINITY CORE ENGINE - Database Schema
+// ============================================
+// 6 Core Tables for complete SaaS functionality
+// Run `npx prisma db push` to sync with database
+// Run `npx prisma migrate dev` for production migrations
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PlanInterval {
+  MONTH
+  YEAR
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+  PAUSED
+}
+
+// ── User ─────────────────────────────────────
+// Core user record synced with Supabase Auth.
+// Created on first sign-up (email or OAuth).
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String?
+  avatarUrl        String?
+  role             Role      @default(USER)
+  stripeCustomerId String?   @unique
+  emailVerified    Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  subscription Subscription?
+  apiUsage     ApiUsage[]
+  projects     Project[]
+
+  @@map("users")
+}
+
+// ── Plan ─────────────────────────────────────
+// Subscription plan definitions synced with Stripe Products.
+// Admin can manage plans; changes sync to Stripe.
+
+model Plan {
+  id            String       @id @default(uuid())
+  name          String       // e.g., "Starter", "Pro", "Enterprise"
+  slug          String       @unique // e.g., "starter", "pro"
+  stripePriceId String?      @unique // Stripe Price ID (pri_xxx)
+  stripeProductId String?    // Stripe Product ID (prod_xxx)
+  price         Int          // Price in cents (e.g., 2900 = $29.00)
+  interval      PlanInterval @default(MONTH)
+  features      Json         @default("[]") // Array of feature strings
+  limits        Json         @default("{}") // { "apiCalls": 1000, "projects": 5 }
+  isActive      Boolean      @default(true)
+  sortOrder     Int          @default(0) // Display order on pricing page
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+// ── Subscription ─────────────────────────────
+// Active subscription linking user to plan.
+// Managed entirely via Stripe webhooks.
+
+model Subscription {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  planId             String
+  stripeSubId        String?            @unique // Stripe Subscription ID (sub_xxx)
+  status             SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  trialEnd           DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// ── ApiUsage ─────────────────────────────────
+// Per-endpoint usage metering for plan limit enforcement.
+// Reset on each billing period via webhook.
+
+model ApiUsage {
+  id          String   @id @default(uuid())
+  userId      String
+  endpoint    String   // e.g., "/api/ai/generate"
+  count       Int      @default(0)
+  periodStart DateTime
+  periodEnd   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint, periodStart])
+  @@map("api_usage")
+}
+
+// ── AppSettings ──────────────────────────────
+// Admin-configurable application settings (key-value store).
+// Used for feature flags, branding, and runtime config.
+
+model AppSettings {
+  id          String   @id @default(uuid())
+  key         String   @unique // e.g., "site.name", "feature.ai_writer"
+  value       Json     // Flexible JSON value
+  description String?  // Human-readable description for admin panel
+  updatedBy   String?  // User ID of last editor
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+// ── WaitList ─────────────────────────────────
+// Pre-launch email capture from landing page.
+// Exportable from admin panel.
+
+model WaitList {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  source    String?  // e.g., "landing_page", "pricing_page"
+  createdAt DateTime @default(now())
+
+  @@map("waitlist")
+}
+
+// ── Project (Example Feature) ────────────────
+// Example CRUD model demonstrating the pattern for
+// building your own features on top of Infinity Core.
+// Replace or extend this with your actual product feature.
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  COMPLETED
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  status      ProjectStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("projects")
+}
