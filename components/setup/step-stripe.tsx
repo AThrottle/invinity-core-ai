@@ -47,12 +47,12 @@ export function StepStripe({
         />
         <SetupInstruction
           step={3}
-          text="Go to Developers then Webhooks then Add endpoint. Set URL to [your-app-url]/api/webhooks/stripe. Select events: checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.payment_succeeded, invoice.payment_failed."
-          link="https://dashboard.stripe.com/test/webhooks"
+          text="Install the Stripe CLI from the link below. Then run: stripe login"
+          link="https://docs.stripe.com/stripe-cli#install"
         />
         <SetupInstruction
           step={4}
-          text="After creating the webhook endpoint, click on it and copy the Signing secret (whsec_...)."
+          text="In a separate terminal, run: npm run stripe:listen — This forwards Stripe events to your local server. Copy the webhook signing secret (whsec_...) from the output."
         />
       </div>
 
@@ -60,6 +60,16 @@ export function StepStripe({
         <p className="text-sm text-blue-800 dark:text-blue-200">
           <strong>Start in Test Mode!</strong> Use test keys (sk_test_..., pk_test_...) while
           building. Switch to live keys only when ready for real payments.
+        </p>
+      </div>
+
+      <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          <strong>Local dev tip:</strong> Keep{" "}
+          <code className="text-xs bg-amber-100 dark:bg-amber-900/50 px-1 py-0.5 rounded">npm run stripe:listen</code>{" "}
+          running in a separate terminal alongside{" "}
+          <code className="text-xs bg-amber-100 dark:bg-amber-900/50 px-1 py-0.5 rounded">npm run dev</code>.
+          The CLI webhook secret changes each session, so update your .env.local if you restart it.
         </p>
       </div>
 

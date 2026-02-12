@@ -7,13 +7,15 @@
 
 import Link from "next/link";
 import { Infinity } from "lucide-react";
-import { siteConfig } from "@/lib/config";
+import { getAppConfig } from "@/lib/app-config";
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const config = await getAppConfig();
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4">
       {/* Logo */}
@@ -21,8 +23,12 @@ export default function AuthLayout({
         href="/"
         className="mb-8 flex items-center space-x-2 text-foreground"
       >
-        <Infinity className="h-8 w-8 text-primary" />
-        <span className="text-2xl font-bold">{siteConfig.name}</span>
+        {config.logoUrl ? (
+          <img src={config.logoUrl} alt={config.name} className="h-8 w-8 object-contain" />
+        ) : (
+          <Infinity className="h-8 w-8 text-primary" />
+        )}
+        <span className="text-2xl font-bold">{config.name}</span>
       </Link>
 
       {/* Auth Card */}
@@ -30,7 +36,7 @@ export default function AuthLayout({
 
       {/* Footer */}
       <p className="mt-8 text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+        &copy; {new Date().getFullYear()} {config.name}. All rights reserved.
       </p>
     </div>
   );

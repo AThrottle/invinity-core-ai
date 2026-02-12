@@ -11,6 +11,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { UserMenu } from "@/components/layout/user-menu";
 import { getUser } from "@/lib/auth/session";
 import { siteConfig } from "@/lib/config";
+import { getAppConfig } from "@/lib/app-config";
 import { ROUTES } from "@/lib/constants";
 
 export default async function DashboardLayout({
@@ -25,9 +26,11 @@ export default async function DashboardLayout({
     redirect(ROUTES.LOGIN);
   }
 
+  const appConfig = await getAppConfig();
+
   return (
     <div className="min-h-screen bg-muted/20">
-      <Sidebar navItems={siteConfig.dashboardNav} />
+      <Sidebar navItems={siteConfig.dashboardNav} appName={appConfig.name} logoUrl={appConfig.logoUrl} />
 
       {/* Main content area — offset by sidebar width */}
       <div className="md:pl-[250px] transition-all duration-300">

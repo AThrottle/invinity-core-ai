@@ -10,6 +10,7 @@ import { UserMenu } from "@/components/layout/user-menu";
 import { Badge } from "@/components/ui/badge";
 import { requireAdmin } from "@/lib/auth/session";
 import { siteConfig } from "@/lib/config";
+import { getAppConfig } from "@/lib/app-config";
 
 export default async function AdminLayout({
   children,
@@ -17,10 +18,11 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const user = await requireAdmin();
+  const appConfig = await getAppConfig();
 
   return (
     <div className="min-h-screen bg-muted/20">
-      <Sidebar navItems={siteConfig.adminNav} isAdmin />
+      <Sidebar navItems={siteConfig.adminNav} isAdmin appName={appConfig.name} logoUrl={appConfig.logoUrl} />
 
       {/* Main content area */}
       <div className="md:pl-[250px] transition-all duration-300">

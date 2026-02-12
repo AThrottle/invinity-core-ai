@@ -42,3 +42,6 @@ prisma/migrations/**/migration_lock.toml
 .idea/
 
 /lib/generated/prisma
+
+# Uploaded files
+/public/uploads/

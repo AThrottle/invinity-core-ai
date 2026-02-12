@@ -15,6 +15,8 @@ import {
   Terminal,
   Globe,
   Rocket,
+  ShieldCheck,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,14 +60,17 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${data.supabaseAnonKey}
 SUPABASE_SERVICE_ROLE_KEY=${data.supabaseServiceRoleKey}
 DATABASE_URL=${data.databaseUrl}
 
-# ── Stripe ────────────────────────────────────
-STRIPE_SECRET_KEY=${data.stripeSecretKey}
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${data.stripePublishableKey}
-STRIPE_WEBHOOK_SECRET=${data.stripeWebhookSecret}
+# ── Stripe (Optional — add when ready for payments) ──
+# Get keys from: dashboard.stripe.com → Developers → API keys
+# For local webhooks: npm run stripe:listen
+STRIPE_SECRET_KEY=${data.stripeSecretKey || ""}
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${data.stripePublishableKey || ""}
+STRIPE_WEBHOOK_SECRET=${data.stripeWebhookSecret || ""}
 
-# ── Resend (Email) ────────────────────────────
-RESEND_API_KEY=${data.resendApiKey}
-RESEND_FROM_EMAIL=${data.resendFromEmail}
+# ── Resend (Optional — add when ready for emails) ──
+# Get from: resend.com → API Keys
+RESEND_API_KEY=${data.resendApiKey || ""}
+RESEND_FROM_EMAIL=${data.resendFromEmail || ""}
 
 # ── NextAuth ──────────────────────────────────
 NEXTAUTH_SECRET=${randomSecret}
@@ -98,9 +103,9 @@ export function StepComplete({ data }: StepCompleteProps) {
     },
     {
       icon: Terminal,
-      title: "2. Set up the database",
+      title: "2. Set up the database & test accounts",
       description:
-        "Run the following commands in your terminal to create the database tables and seed initial data:",
+        "Run the following commands in your terminal to create the database tables, seed initial data, and create test accounts:",
       code: "npx prisma db push && npm run db:seed",
     },
     {
@@ -114,7 +119,7 @@ export function StepComplete({ data }: StepCompleteProps) {
       icon: Rocket,
       title: "4. You're live!",
       description:
-        "Open http://localhost:3000 in your browser. You should see the landing page. Sign up for an account to test the full flow.",
+        "Open http://localhost:3000 and log in with the test accounts below. No email verification needed.",
     },
   ];
 
@@ -197,6 +202,65 @@ export function StepComplete({ data }: StepCompleteProps) {
           </Card>
         ))}
       </div>
+
+      {/* Test Account Credentials */}
+      <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-amber-600" />
+            Test Account Credentials
+          </CardTitle>
+          <CardDescription>
+            These accounts are auto-created when you run <code className="text-xs bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded">npm run db:seed</code>.
+            No email verification required.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-start gap-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-950 p-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-red-100 dark:bg-red-900/30">
+              <ShieldCheck className="h-4 w-4 text-red-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm">Admin Account</p>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                  ADMIN
+                </span>
+              </div>
+              <div className="mt-1 font-mono text-xs text-muted-foreground">
+                <span className="text-foreground">admin@test.com</span>
+                {" / "}
+                <span className="text-foreground">Admin123!</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Full access: dashboard, admin panel, user management, Pro plan
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-950 p-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/30">
+              <User className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm">User Account</p>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  USER
+                </span>
+              </div>
+              <div className="mt-1 font-mono text-xs text-muted-foreground">
+                <span className="text-foreground">user@test.com</span>
+                {" / "}
+                <span className="text-foreground">User123!</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Standard access: dashboard, projects, billing, Free plan
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

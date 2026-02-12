@@ -13,11 +13,13 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "setup": "tsx scripts/setup.ts",
     "factory-reset": "tsx scripts/factory-reset.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.3.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -44,6 +46,7 @@
     "lucide-react": "^0.563.0",
     "next": "^14.2.35",
     "next-auth": "^5.0.0-beta.30",
+    "pg": "^8.18.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.71.1",
@@ -57,6 +60,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.2.2",
+    "@types/pg": "^8.16.0",
     "autoprefixer": "^10.4.24",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",

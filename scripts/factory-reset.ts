@@ -16,9 +16,16 @@
  * WARNING: This is destructive. All user data will be permanently deleted.
  */
 
-import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+dotenv.config({ path: [".env.local", ".env"] });
 
-const prisma = new PrismaClient();
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("");

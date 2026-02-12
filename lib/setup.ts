@@ -6,6 +6,8 @@
  *
  * Required services:
  * 1. Supabase (database + auth)
+ *
+ * Optional services (can be configured later):
  * 2. Stripe (payments)
  * 3. Resend (transactional email)
  *
@@ -29,6 +31,7 @@ export interface SetupStatus {
 /**
  * Check if all required environment variables are set.
  * Called on every request via middleware to detect unconfigured state.
+ * Only Supabase + App config are required. Stripe and Resend are optional.
  */
 export function checkSetupStatus(): SetupStatus {
   const supabase = checkSupabase();
@@ -37,7 +40,7 @@ export function checkSetupStatus(): SetupStatus {
   const app = checkApp();
 
   return {
-    isComplete: supabase.configured && stripe.configured && resend.configured && app.configured,
+    isComplete: supabase.configured && app.configured,
     supabase,
     stripe,
     resend,

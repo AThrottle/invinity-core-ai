@@ -2,8 +2,8 @@
  * Setup Wizard Page
  * ──────────────────
  * The first thing a user sees after cloning the repo.
- * Guides them through connecting Supabase, Stripe, Resend,
- * and configuring their app — step by step.
+ * Guides them through connecting Supabase (required) and
+ * configuring branding. Stripe and Resend can be added later.
  *
  * This page is intentionally a Client Component because it
  * manages multi-step form state and real-time validation.
@@ -14,8 +14,6 @@
 import { useState } from "react";
 import { StepWelcome } from "@/components/setup/step-welcome";
 import { StepSupabase } from "@/components/setup/step-supabase";
-import { StepStripe } from "@/components/setup/step-stripe";
-import { StepResend } from "@/components/setup/step-resend";
 import { StepBranding } from "@/components/setup/step-branding";
 import { StepValidate } from "@/components/setup/step-validate";
 import { StepComplete } from "@/components/setup/step-complete";
@@ -26,16 +24,16 @@ import { SetupProgress } from "@/components/setup/setup-progress";
  * Passed between steps and submitted to the validation API.
  */
 export interface SetupData {
-  // Supabase
+  // Supabase (required)
   supabaseUrl: string;
   supabaseAnonKey: string;
   supabaseServiceRoleKey: string;
   databaseUrl: string;
-  // Stripe
+  // Stripe (optional — configure later)
   stripeSecretKey: string;
   stripePublishableKey: string;
   stripeWebhookSecret: string;
-  // Resend
+  // Resend (optional — configure later)
   resendApiKey: string;
   resendFromEmail: string;
   // Branding
@@ -62,11 +60,9 @@ const INITIAL_DATA: SetupData = {
 const STEPS = [
   { id: "welcome", title: "Welcome", number: 0 },
   { id: "supabase", title: "Database & Auth", number: 1 },
-  { id: "stripe", title: "Payments", number: 2 },
-  { id: "resend", title: "Email", number: 3 },
-  { id: "branding", title: "Branding", number: 4 },
-  { id: "validate", title: "Validate", number: 5 },
-  { id: "complete", title: "Complete", number: 6 },
+  { id: "branding", title: "Branding", number: 2 },
+  { id: "validate", title: "Validate", number: 3 },
+  { id: "complete", title: "Complete", number: 4 },
 ];
 
 export default function SetupPage() {
@@ -97,18 +93,12 @@ export default function SetupPage() {
         <StepSupabase data={data} updateData={updateData} onNext={next} onBack={back} />
       )}
       {currentStep === 2 && (
-        <StepStripe data={data} updateData={updateData} onNext={next} onBack={back} />
-      )}
-      {currentStep === 3 && (
-        <StepResend data={data} updateData={updateData} onNext={next} onBack={back} />
-      )}
-      {currentStep === 4 && (
         <StepBranding data={data} updateData={updateData} onNext={next} onBack={back} />
       )}
-      {currentStep === 5 && (
+      {currentStep === 3 && (
         <StepValidate data={data} onNext={next} onBack={back} />
       )}
-      {currentStep === 6 && <StepComplete data={data} />}
+      {currentStep === 4 && <StepComplete data={data} />}
     </div>
   );
 }

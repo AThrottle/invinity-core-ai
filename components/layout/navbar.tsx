@@ -7,16 +7,26 @@ import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config";
 import { ROUTES } from "@/lib/constants";
 
-export function Navbar() {
+interface NavbarProps {
+  appName?: string;
+  logoUrl?: string | null;
+}
+
+export function Navbar({ appName, logoUrl }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const displayName = appName || siteConfig.name;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center space-x-2">
-          <Infinity className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">{siteConfig.name}</span>
+          {logoUrl ? (
+            <img src={logoUrl} alt={displayName} className="h-6 w-6 object-contain" />
+          ) : (
+            <Infinity className="h-6 w-6 text-primary" />
+          )}
+          <span className="text-xl font-bold">{displayName}</span>
         </Link>
 
         {/* Desktop Navigation */}

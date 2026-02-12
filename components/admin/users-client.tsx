@@ -16,9 +16,11 @@ import {
   Shield,
   User,
   Loader2,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -33,10 +35,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
-import { changeUserRole } from "@/lib/admin/actions";
+import { changeUserRole, createUser } from "@/lib/admin/actions";
 
 interface UserRow {
   id: string;
@@ -71,6 +82,9 @@ export function AdminUsersClient({
   const { toast } = useToast();
   const [searchValue, setSearchValue] = useState(search);
   const [loading, setLoading] = useState<string | null>(null);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   function navigate(params: Record<string, string>) {
     const sp = new URLSearchParams();
@@ -100,13 +114,117 @@ export function AdminUsersClient({
     setLoading(null);
   }
 
+  async function handleCreateUser(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setAddLoading(true);
+    setAddError(null);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const result = await createUser(formData);
+    if (result.error) {
+      setAddError(result.error);
+      setAddLoading(false);
+    } else {
+      toast({ title: "User Created", description: result.success, variant: "success" });
+      setAddDialogOpen(false);
+      setAddLoading(false);
+      form.reset();
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">User Management</h2>
-        <p className="text-muted-foreground">
-          {total} total user{total !== 1 ? "s" : ""}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">User Management</h2>
+          <p className="text-muted-foreground">
+            {total} total user{total !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <Dialog open={addDialogOpen} onOpenChange={(open) => { setAddDialogOpen(open); if (!open) setAddError(null); }}>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New User</DialogTitle>
+              <DialogDescription>
+                Create a user account with email pre-verified. No confirmation email will be sent.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-name">Full Name</Label>
+                <Input
+                  id="add-name"
+                  name="name"
+                  placeholder="John Doe"
+                  required
+                  minLength={2}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-email">Email</Label>
+                <Input
+                  id="add-email"
+                  name="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-password">Password</Label>
+                <Input
+                  id="add-password"
+                  name="password"
+                  type="password"
+                  placeholder="Min 8 characters"
+                  required
+                  minLength={8}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-role">Role</Label>
+                <div className="flex gap-2">
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="role" value="USER" defaultChecked className="peer sr-only" />
+                    <div className="flex items-center justify-center gap-2 rounded-md border-2 border-muted bg-transparent p-2.5 text-sm font-medium peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                      <User className="h-4 w-4" />
+                      User
+                    </div>
+                  </label>
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="role" value="ADMIN" className="peer sr-only" />
+                    <div className="flex items-center justify-center gap-2 rounded-md border-2 border-muted bg-transparent p-2.5 text-sm font-medium peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </div>
+                  </label>
+                </div>
+              </div>
+              {addError && (
+                <div className="rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3">
+                  <p className="text-sm text-red-800 dark:text-red-200">{addError}</p>
+                </div>
+              )}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={addLoading}>
+                  {addLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create User
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Search + Filters */}

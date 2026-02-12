@@ -44,8 +44,6 @@ interface ValidationResult {
 export function StepValidate({ data, onNext, onBack }: StepValidateProps) {
   const [results, setResults] = useState<ValidationResult[]>([
     { service: "Supabase", status: "idle", message: "Not checked yet" },
-    { service: "Stripe", status: "idle", message: "Not checked yet" },
-    { service: "Resend", status: "idle", message: "Not checked yet" },
   ]);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -73,16 +71,6 @@ export function StepValidate({ data, onNext, onBack }: StepValidateProps) {
           service: "Supabase",
           status: result.supabase?.success ? "pass" : "fail",
           message: result.supabase?.message || "Unknown error",
-        },
-        {
-          service: "Stripe",
-          status: result.stripe?.success ? "pass" : "fail",
-          message: result.stripe?.message || "Unknown error",
-        },
-        {
-          service: "Resend",
-          status: result.resend?.success ? "pass" : "fail",
-          message: result.resend?.message || "Unknown error",
         },
       ]);
     } catch (error) {

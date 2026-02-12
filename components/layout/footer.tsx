@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { Infinity } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { getAppConfig } from "@/lib/app-config";
 
-export function Footer() {
+export async function Footer() {
+  const config = await getAppConfig();
+
   return (
     <footer className="border-t bg-muted/30">
       <div className="container py-12 md:py-16">
@@ -10,11 +13,15 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <Infinity className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">{siteConfig.name}</span>
+              {config.logoUrl ? (
+                <img src={config.logoUrl} alt={config.name} className="h-6 w-6 object-contain" />
+              ) : (
+                <Infinity className="h-6 w-6 text-primary" />
+              )}
+              <span className="text-lg font-bold">{config.name}</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              {siteConfig.description}
+              {config.description}
             </p>
           </div>
 
@@ -67,7 +74,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {config.name}. All rights reserved.</p>
           <p className="mt-2 md:mt-0">
             Built with Next.js, Supabase, and Stripe
           </p>

@@ -104,8 +104,9 @@ export async function POST(request: NextRequest) {
       // New billing period started — reset usage counters
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as Stripe.Invoice;
+        const invoiceSubId = (invoice as any).subscription as string | null;
 
-        if (invoice.subscription) {
+        if (invoiceSubId) {
           // Find the user by customer ID
           const customerId =
             typeof invoice.customer === "string"
@@ -131,18 +132,14 @@ export async function POST(request: NextRequest) {
       // Payment failed — subscription enters dunning
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
+        const invoiceSubId = (invoice as any).subscription as string | null;
 
-        if (invoice.subscription) {
-          const subscriptionId =
-            typeof invoice.subscription === "string"
-              ? invoice.subscription
-              : invoice.subscription.id;
-
+        if (invoiceSubId) {
           await prisma.subscription.updateMany({
-            where: { stripeSubId: subscriptionId },
+            where: { stripeSubId: invoiceSubId },
             data: { status: "PAST_DUE" },
           });
-          console.log(`✓ Subscription past due: ${subscriptionId}`);
+          console.log(`✓ Subscription past due: ${invoiceSubId}`);
         }
         break;
       }

@@ -9,11 +9,12 @@
 import Link from "next/link";
 import { ArrowRight, Infinity, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/config";
+import { getAppConfig } from "@/lib/app-config";
 import { ROUTES } from "@/lib/constants";
 
-export function HeroSection() {
-  const parts = siteConfig.tagline.split(",");
+export async function HeroSection() {
+  const config = await getAppConfig();
+  const parts = config.tagline.split(",");
 
   return (
     <section className="relative overflow-hidden">
@@ -44,7 +45,7 @@ export function HeroSection() {
 
           {/* Subheadline */}
           <p className="mb-8 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
-            {siteConfig.description}
+            {config.description}
           </p>
 
           {/* CTAs */}

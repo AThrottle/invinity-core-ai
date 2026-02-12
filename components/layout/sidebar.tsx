@@ -36,9 +36,11 @@ const iconMap: Record<string, React.ElementType> = {
 interface SidebarProps {
   navItems: { title: string; href: string; icon: string }[];
   isAdmin?: boolean;
+  appName?: string;
+  logoUrl?: string | null;
 }
 
-export function Sidebar({ navItems, isAdmin = false }: SidebarProps) {
+export function Sidebar({ navItems, isAdmin = false, appName, logoUrl }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -74,9 +76,13 @@ export function Sidebar({ navItems, isAdmin = false }: SidebarProps) {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <Link href="/" className="flex items-center space-x-2">
-              <Infinity className="h-6 w-6 text-primary shrink-0" />
+              {logoUrl ? (
+                <img src={logoUrl} alt={appName || siteConfig.name} className="h-6 w-6 object-contain shrink-0" />
+              ) : (
+                <Infinity className="h-6 w-6 text-primary shrink-0" />
+              )}
               {!collapsed && (
-                <span className="text-lg font-bold">{siteConfig.name}</span>
+                <span className="text-lg font-bold">{appName || siteConfig.name}</span>
               )}
             </Link>
             <button

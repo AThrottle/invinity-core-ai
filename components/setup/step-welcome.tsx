@@ -10,8 +10,6 @@
 import {
   Infinity,
   Database,
-  CreditCard,
-  Mail,
   Clock,
   ArrowRight,
   ExternalLink,
@@ -37,20 +35,6 @@ const prerequisites = [
     link: "https://supabase.com",
     time: "2 min",
   },
-  {
-    icon: CreditCard,
-    title: "Stripe Account",
-    description: "Free to create — handles subscription payments and billing",
-    link: "https://stripe.com",
-    time: "3 min",
-  },
-  {
-    icon: Mail,
-    title: "Resend Account",
-    description: "Free tier (3,000 emails/mo) — handles transactional emails",
-    link: "https://resend.com",
-    time: "1 min",
-  },
 ];
 
 export function StepWelcome({ onNext }: StepWelcomeProps) {
@@ -65,15 +49,15 @@ export function StepWelcome({ onNext }: StepWelcomeProps) {
           Welcome to Infinity Core Engine
         </h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-          Let's get your SaaS up and running. This wizard will walk you through
-          connecting the three services that power your application.
+          Let's get your SaaS up and running. You just need to connect your
+          database and you're good to go. Stripe and Resend can be added later.
         </p>
       </div>
 
       {/* Time estimate */}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
         <Clock className="h-4 w-4" />
-        <span>Total setup time: ~10 minutes</span>
+        <span>Total setup time: ~3 minutes</span>
       </div>
 
       {/* Prerequisites */}
@@ -114,12 +98,11 @@ export function StepWelcome({ onNext }: StepWelcomeProps) {
       </div>
 
       {/* Tip */}
-      <Card className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800">
+      <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800">
         <CardContent className="p-4">
-          <p className="text-sm text-amber-800 dark:text-amber-200">
-            <strong>Tip:</strong> Open each service's website in a new tab now.
-            Sign up if you haven't already — all three have generous free tiers.
-            This wizard will tell you exactly where to find each credential.
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            <strong>Quick start:</strong> All you need is a Supabase account (free tier).
+            Payments (Stripe) and emails (Resend) can be configured later from your .env.local file.
           </p>
         </CardContent>
       </Card>
